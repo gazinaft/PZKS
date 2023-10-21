@@ -12,9 +12,16 @@ public class OperationsValidator : ValidatorState
     
     public OperationsValidator(ValidatorStateMachine stateMachine) : base(stateMachine) { }
 
-    private bool ValidateDoubleOperations(List<Token> tokens)
+    private void ValidateDoubleOperations(List<Token> tokens)
     {
-        return false;
+        for (var i = 0; i < tokens.Count - 1; i++)
+        {
+            if (Operation.Contains(tokens[i].TokenType)
+                && Operation.Contains(tokens[i + 1].TokenType))
+            {
+                ReportError("Double operations:" + tokens[i]);
+            }
+        }
     }
 
     private bool ValidateBeforeParentheses(List<Token> tokens)
@@ -36,9 +43,4 @@ public class OperationsValidator : ValidatorState
         ExecuteNextState(tokens);
     }
 
-    public override void ReportError(Token token)
-    {
-        base.ReportError(token);
-        Console.WriteLine("Error with operation " + token.ToString());
-    }
 }

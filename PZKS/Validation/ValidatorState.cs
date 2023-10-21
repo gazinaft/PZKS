@@ -15,9 +15,10 @@ public abstract class ValidatorState
         StateMachine.Validate(tokens);
     }
 
-    public virtual void ReportError(Token token)
+    protected virtual void ReportError(string message, Token? token = null)
     {
         StateMachine.HasErrors = true;
+        Console.WriteLine(message + " " + token?.ToString());
     }
     
     public ValidatorState? NextState { get; set; }

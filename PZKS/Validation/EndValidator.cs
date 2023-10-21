@@ -13,14 +13,9 @@ public class EndValidator : ValidatorState
         var lastToken = tokens[^1];
         if (ForbiddenSymbols.Contains(lastToken.TokenType))
         {
-            ReportError(lastToken);
+            ReportError("Algebraic operation at the end of the expression", lastToken);
         }
         ExecuteNextState(tokens);
     }
 
-    public override void ReportError(Token token)
-    {
-        base.ReportError(token);
-        Console.WriteLine("Algebraic operation at the end of the expression " + token.ToString());
-    }
 }
