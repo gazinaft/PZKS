@@ -55,12 +55,14 @@ public class Lexer
                 if (IsDigit(c))
                 {
                     ReadNumber(expression);
+                    break;
                 }
-                else if (IsAlpha(c))
+                if (IsAlpha(c))
                 {
                     ReadVariable(expression);
+                    break;
                 }
-                
+                Console.WriteLine("Invalid symbol at " + (current - 1));
                 break;
         };
         
