@@ -6,5 +6,7 @@ public enum TokenType
     Minus, Plus,
     Mult, Div,
     Variable,
-    Number
+    Number,
+    Comma,
+    Invalid
 }

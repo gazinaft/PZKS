@@ -21,18 +21,28 @@ public static class Program
         var start = new StartValidator(validator);
         var parentheses = new ParenthesesValidator(validator);
         var operations = new OperationsValidator(validator);
+        var commas = new FunctionValidator(validator);
         var end = new EndValidator(validator);
         
-        validator.State = start;
+        validator.StartState = start;
         start.NextState = parentheses;
-        parentheses.NextState = operations;
+        parentheses.NextState = commas;
+        commas.NextState = operations;
         operations.NextState = end;
-        
+
         var expression = Console.ReadLine();
-        if (expression == null) return;
-
-        var tokens = lexer.Scan(expression);
-        validator.Validate(tokens);
-
+        while (expression != null)
+        {
+            var tokens = lexer.Scan(expression);
+            validator.Validate(tokens);
+            // foreach (var token in tokens)
+            // {
+            //     Console.WriteLine(token);
+            // }
+            validator.Reset();
+            expression = Console.ReadLine();
+            
+        }
+        
     }
 }

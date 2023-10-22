@@ -48,9 +48,14 @@ public class ParenthesesValidator : ValidatorState
             }
         }
 
-        if (openBrackets != 0)
+        if (openBrackets > 0)
         {
             ReportError($"Not all parentheses are closed, you need to close {openBrackets} parentheses");
+        }
+
+        if (openBrackets < 0)
+        {
+            ReportError($"Not all parentheses have opening, there are {-openBrackets} closing parentheses without opening");
         }
     }
 }
