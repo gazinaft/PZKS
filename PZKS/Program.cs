@@ -19,7 +19,14 @@ public static class Program
         var lexer = new Lexer();
         var validator = new ValidatorStateMachine();
         var start = new StartValidator(validator);
+        var parentheses = new ParenthesesValidator(validator);
+        var operations = new OperationsValidator(validator);
+        var end = new EndValidator(validator);
+        
         validator.State = start;
+        start.NextState = parentheses;
+        parentheses.NextState = operations;
+        operations.NextState = end;
         
         var expression = Console.ReadLine();
         if (expression == null) return;

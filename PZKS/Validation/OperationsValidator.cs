@@ -12,6 +12,15 @@ public class OperationsValidator : ValidatorState
     
     public OperationsValidator(ValidatorStateMachine stateMachine) : base(stateMachine) { }
 
+    public override void Validate(List<Token> tokens)
+    {
+        ValidateDoubleOperations(tokens);
+        ValidateBeforeParentheses(tokens);
+        ValidateInParentheses(tokens);
+        
+        ExecuteNextState(tokens);
+    }
+    
     private void ValidateDoubleOperations(List<Token> tokens)
     {
         for (var i = 0; i < tokens.Count - 1; i++)
@@ -24,23 +33,28 @@ public class OperationsValidator : ValidatorState
         }
     }
 
-    private bool ValidateBeforeParentheses(List<Token> tokens)
+    private void ValidateBeforeParentheses(List<Token> tokens)
     {
-        return false;
+        for (int i = 1; i < tokens.Count; i++)
+        {
+            if (tokens[i].TokenType == TokenType.LeftParent
+                && !Operation.Contains(tokens[i].TokenType))
+            {
+                ReportError("Missing an operation symbol before parentheses:", tokens[i]);
+            }
+        }
     }
 
-    private bool ValidateInParentheses(List<Token> tokens)
+    private void ValidateInParentheses(List<Token> tokens)
     {
-        return false;
-    }
-
-    public override void Validate(List<Token> tokens)
-    {
-        ValidateDoubleOperations(tokens);
-        ValidateBeforeParentheses(tokens);
-        ValidateInParentheses(tokens);
-        
-        ExecuteNextState(tokens);
+        for (int i = 0; i < tokens.Count - 1; i++)
+        {
+            if (tokens[i].TokenType == TokenType.LeftParent
+                && InParentOperation.Contains(tokens[i + 1].TokenType))
+            {
+                ReportError("Invalid operation after opening parentheses:", tokens[i]);
+            }
+        }
     }
 
 }
