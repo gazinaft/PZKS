@@ -18,11 +18,11 @@ public static class Program
     {
         var lexer = new Lexer();
         var validator = new ValidatorStateMachine();
-        var start = new StartValidator(validator);
-        var parentheses = new ParenthesesValidator(validator);
-        var operations = new OperationsValidator(validator);
-        var commas = new FunctionValidator(validator);
-        var end = new EndValidator(validator);
+        var start = new StartValidator();
+        var parentheses = new ParenthesesValidator();
+        var operations = new OperationsValidator();
+        var commas = new FunctionValidator();
+        var end = new EndValidator();
         
         validator.StartState = start;
         start.NextState = parentheses;
@@ -30,19 +30,26 @@ public static class Program
         commas.NextState = operations;
         operations.NextState = end;
 
-        var expression = Console.ReadLine();
+        // parse as expressions func arguments
+        // parentheses between variables
+        var expression = "-cos(-&t))/(*(*f)(127.0.0.1, /dev/null/, (t==0)?4more_errors:b^2) - .5";
+        // /a*b**c + m)*a*b + a*c - a*smn(j*k/m + m
+
+        // var isParsed = double.TryParse("12,3", out double res);
+        // Console.WriteLine(isParsed + " " + res);
+        // var expression = "-cos(-t)/f(127,001, /dev/null, +(t0)more_errorsb2) - 5";
+        Console.WriteLine(expression);
         while (expression != null)
         {
             var tokens = lexer.Scan(expression);
             validator.Validate(tokens);
-            // foreach (var token in tokens)
-            // {
-            //     Console.WriteLine(token);
-            // }
+            foreach (var token in tokens)
+            {
+                Console.WriteLine(token);
+            }
             validator.Reset();
             expression = Console.ReadLine();
             
         }
-        
     }
 }

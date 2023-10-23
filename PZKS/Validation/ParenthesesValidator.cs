@@ -4,32 +4,33 @@ namespace PZKS.Validation;
 
 public class ParenthesesValidator : ValidatorState
 {
-    public ParenthesesValidator(ValidatorStateMachine stateMachine) : base(stateMachine)
+
+    protected override bool Validate(List<Token> tokens)
     {
+        return EmptyParenthesesCheck(tokens) &&
+               OrderAndCountParenthesesCheck(tokens);
     }
 
-    public override void Validate(List<Token> tokens)
+    private bool EmptyParenthesesCheck(List<Token> tokens)
     {
-        EmptyParenthesesCheck(tokens);
-        OrderAndCountParenthesesCheck(tokens);
-        
-        ExecuteNextState(tokens);
-    }
+        var success = true;
 
-    private void EmptyParenthesesCheck(List<Token> tokens)
-    {
         for (var i = 0; i < tokens.Count - 1; i++)
         {
             if (tokens[i].TokenType == TokenType.LeftParent
                 && tokens[i + 1].TokenType == TokenType.RightParent)
             {
                 ReportError("Parentheses are empty:", tokens[i]);
+                success = false;
             } 
         }
+
+        return success;
     }
 
-    private void OrderAndCountParenthesesCheck(List<Token> tokens)
+    private bool OrderAndCountParenthesesCheck(List<Token> tokens)
     {
+        var success = true;
         var openBrackets = 0;
 
         foreach (var t in tokens)
@@ -45,17 +46,22 @@ public class ParenthesesValidator : ValidatorState
             if (openBrackets < 0)
             {
                 ReportError("Closing parentheses before opening parentheses", t);
+                success = false;
             }
         }
 
         if (openBrackets > 0)
         {
             ReportError($"Not all parentheses are closed, you need to close {openBrackets} parentheses");
+            success = false;
         }
 
         if (openBrackets < 0)
         {
             ReportError($"Not all parentheses have opening, there are {-openBrackets} closing parentheses without opening");
+            success = false;
         }
+
+        return success;
     }
 }

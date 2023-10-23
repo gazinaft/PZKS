@@ -8,15 +8,25 @@ public class ValidatorStateMachine
     public bool HasErrors { get; set; }
     
     public ValidatorState? StartState { get; set; }
+
+    private void ValidateRecursive(List<Token> tokens)
+    {
+        var validator = new ValidatorStateMachine
+        {
+            StartState = StartState
+        };
+        
+        validator.Validate(tokens);
+    }
     
     public void Validate(List<Token> tokens)
     {
         if (State != null)
         {
-            State.Validate(tokens);
+            State.ValidateExpression(tokens);
             return;
         }
-        StartState?.Validate(tokens);
+        StartState?.ValidateExpression(tokens);
     }
 
     public void Reset()

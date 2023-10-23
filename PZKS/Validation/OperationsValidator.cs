@@ -10,32 +10,35 @@ public class OperationsValidator : ValidatorState
     private static readonly List<TokenType> InParentOperation = new()
         { TokenType.Div, TokenType.Mult };
     
-    public OperationsValidator(ValidatorStateMachine stateMachine) : base(stateMachine) { }
 
-    public override void Validate(List<Token> tokens)
+    protected override bool Validate(List<Token> tokens)
     {
-        ValidateDoubleOperations(tokens);
-        ValidateBeforeParentheses(tokens);
-        ValidateInParentheses(tokens);
-        ClosingParentheses(tokens);
-        
-        ExecuteNextState(tokens);
+        return ValidateDoubleOperations(tokens) &&
+               ValidateBeforeParentheses(tokens) &&
+               ValidateInParentheses(tokens) &&
+               ClosingParentheses(tokens);
     }
     
-    private void ValidateDoubleOperations(List<Token> tokens)
+    private bool ValidateDoubleOperations(List<Token> tokens)
     {
+        var success = true;
         for (var i = 0; i < tokens.Count - 1; i++)
         {
             if (Operation.Contains(tokens[i].TokenType)
                 && Operation.Contains(tokens[i + 1].TokenType))
             {
                 ReportError("Double operations:" + tokens[i]);
+                success = false;
             }
         }
+
+        return success;
     }
 
-    private void ValidateBeforeParentheses(List<Token> tokens)
+    private bool ValidateBeforeParentheses(List<Token> tokens)
     {
+        var success = true;
+
         for (int i = 1; i < tokens.Count; i++)
         {
             if (tokens[i].TokenType == TokenType.LeftParent
@@ -44,32 +47,45 @@ public class OperationsValidator : ValidatorState
                     && tokens[i - 1].TokenType != TokenType.LeftParent))
             {
                 ReportError("Missing an operation symbol before parentheses:", tokens[i]);
+                success = false;
+
             }
         }
+
+        return success;
     }
 
-    private void ValidateInParentheses(List<Token> tokens)
+    private bool ValidateInParentheses(List<Token> tokens)
     {
+        var success = true;
+
         for (int i = 0; i < tokens.Count - 1; i++)
         {
             if (tokens[i].TokenType == TokenType.LeftParent
                 && InParentOperation.Contains(tokens[i + 1].TokenType))
             {
                 ReportError("Invalid operation after opening parentheses:", tokens[i]);
+                success = false;
             }
         }
+
+        return success;
     }
 
-    private void ClosingParentheses(List<Token> tokens)
+    private bool ClosingParentheses(List<Token> tokens)
     {
+        bool success = true;
         for (int i = 1; i < tokens.Count; i++)
         {
             if (tokens[i].TokenType == TokenType.RightParent
                 && InParentOperation.Contains(tokens[i - 1].TokenType))
             {
                 ReportError("Invalid operation before closing parentheses:", tokens[i]);
+                success = false;
             }
         }
+
+        return success;
     }
 
 }

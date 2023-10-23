@@ -4,16 +4,12 @@ namespace PZKS.Validation;
 public class StartValidator : ValidatorState
 {
     private static readonly List<TokenType> ForbiddenSymbols = new() { TokenType.Div , TokenType.Mult, TokenType.RightParent};
-
-
-    public StartValidator(ValidatorStateMachine stateMachine) : base(stateMachine) { }
     
-    public override void Validate(List<Token> tokens)
+    protected override bool Validate(List<Token> tokens)
     {
-        if (ForbiddenSymbols.Contains(tokens[0].TokenType))
-        {
-            ReportError("Invalid token at the start of the expression", tokens[0]);
-        }
-        ExecuteNextState(tokens);
+        if (!ForbiddenSymbols.Contains(tokens[0].TokenType)) return true;
+        
+        ReportError("Invalid token at the start of the expression", tokens[0]);
+        return false;
     }
 }

@@ -62,7 +62,7 @@ public class Lexer
                     ReadVariable(expression);
                     break;
                 }
-                Console.WriteLine("Invalid symbol at " + (current - 1));
+                Console.WriteLine("Invalid symbol at " + (current - 1) + expression[current -1]);
                 break;
         };
         
@@ -126,16 +126,20 @@ public class Lexer
         while (IsDigit(Peek(source))) Advance(source);
 
         // Look for a fractional part.
-        if (Peek(source) == '.' && IsDigit(PeekNext(source))) {
-            // Consume the "."
+        if (Peek(source) == ',' && IsDigit(PeekNext(source))) {
+            // Consume the ","
             Advance(source);
 
             while (IsDigit(Peek(source))) Advance(source);
         }
 
         var text = source.Substring(start, current - start);
-        
-        AddToken(TokenType.Number, text, double.Parse(text));
+        if (!double.TryParse(text, out var res))
+        {
+            Console.WriteLine("Wrong format number at "  + current + " " + source[current - 1]);
+            return;
+        }
+        AddToken(TokenType.Number, text, res);
     }
 
     private void ReadVariable(string source)

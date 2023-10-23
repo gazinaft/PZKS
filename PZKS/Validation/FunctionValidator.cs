@@ -2,24 +2,12 @@ namespace PZKS.Validation;
 
 public class FunctionValidator : ValidatorState
 {
-    public FunctionValidator(ValidatorStateMachine stateMachine) : base(stateMachine) { }
-
-    public override void Validate(List<Token> tokens)
+    protected override bool Validate(List<Token> tokens)
     {
         if (!tokens.Exists(x => x.TokenType == TokenType.Comma))
         {
-            ExecuteNextState(tokens);
-            return;
+            return true;
         }
-
-        CommaInFunctionParentheses(tokens);
-        ValidateDoubleComma(tokens);
-        
-        ExecuteNextState(tokens);
-    }
-
-    private void CommaInFunctionParentheses(List<Token> tokens)
-    {
         var functionScopes = new List<(int, int)>();
         
         for (int i = 0; i < tokens.Count - 1; i++)
@@ -37,37 +25,68 @@ public class FunctionValidator : ValidatorState
             functionScopes.Add((i + 1, endPar));
         }
         
+        return CommaInFunctionParentheses(tokens, functionScopes) &&
+            ValidateDoubleComma(tokens);
+        
+    }
+
+    private bool ValidateSubexpressions()
+    {
+        return true;
+    }
+    
+    private bool CommaInFunctionParentheses(List<Token> tokens, List<(int, int)> functionScopes)
+    {
+        var success = true;
+        
         for (int i = 0; i < tokens.Count; i++)
         {
             if (tokens[i].TokenType != TokenType.Comma) continue;
             
             var commaInFunction = functionScopes.Any(x => x.Item1 < i && x.Item2 > i);
-            if (!commaInFunction) ReportError("Comma out of function scope" + tokens[i]);
+            if (!commaInFunction)
+            {
+                ReportError("Comma out of function scope" + tokens[i]);
+                success = false;
+            }
+            
         }
+
+        return success;
     }
 
-    private void ValidateDoubleComma(List<Token> tokens)
+    private bool ValidateDoubleComma(List<Token> tokens)
     {
+        var success = true;
         for (var i = 0; i < tokens.Count - 1; i++)
         {
             if (tokens[i].TokenType == TokenType.Comma
                 && tokens[i + 1].TokenType == TokenType.Comma)
             {
                 ReportError("Double comma:" + tokens[i]);
+                success = false;
             }
         }
+
+        return success;
     }
     
-    private void ClosingParentheses(List<Token> tokens)
+    private bool ClosingParentheses(List<Token> tokens)
     {
+        var success = true;
+
         for (int i = 1; i < tokens.Count; i++)
         {
             if (tokens[i].TokenType == TokenType.RightParent
                 && tokens[i - 1].TokenType == TokenType.Comma)
             {
                 ReportError("Invalid comma before closing parentheses:", tokens[i]);
+                success = false;
+
             }
         }
+
+        return success;
     }
     
 }
