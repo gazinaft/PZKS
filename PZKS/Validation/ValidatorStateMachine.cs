@@ -11,16 +11,18 @@ public class ValidatorStateMachine
 
     private void ValidateRecursive(List<Token> tokens)
     {
-        var validator = new ValidatorStateMachine
-        {
-            StartState = StartState
-        };
+        var validator = new ValidatorStateMachine { StartState = StartState };
         
         validator.Validate(tokens);
     }
     
     public void Validate(List<Token> tokens)
     {
+        var subexpressions = Util.GetSubexpressions(tokens);
+        foreach (var subexpression in subexpressions)
+        {
+            Validate(subexpression);
+        }
         if (State != null)
         {
             State.ValidateExpression(tokens);

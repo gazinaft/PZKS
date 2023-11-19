@@ -57,12 +57,13 @@ public class Lexer
                     ReadNumber(expression);
                     break;
                 }
+
                 if (IsAlpha(c))
                 {
                     ReadVariable(expression);
                     break;
                 }
-                Console.WriteLine("Invalid symbol at " + (current - 1) + expression[current -1]);
+                Util.ReportError("Invalid symbol at " + (current - 1) + expression[current -1]);
                 break;
         };
         

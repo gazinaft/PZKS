@@ -32,12 +32,14 @@ public static class Program
 
         // parse as expressions func arguments
         // parentheses between variables
-        var expression = "-cos(-&t))/(*(*f)(127.0.0.1, /dev/null/, (t==0)?4more_errors:b^2) - .5";
-        // /a*b**c + m)*a*b + a*c - a*smn(j*k/m + m
+        // var expression = "-cos(-&t))/(*(*f)(127.0.0.1, /dev/null/, (t==0)?4more_errors:b^2) - .5";
+        var expression = "-cos(-t)/f(127,001, dev/null, (t0)+4*more_errorsb2) - 5";
+        // var expression = "-cos(-t)/f(127001, dev/null, (t0)*4*more_errorsb2) - 5";
+        // var expression = "a*b*c + m*a*b + a*c - a*smnj*k/m + m";
 
         // var isParsed = double.TryParse("12,3", out double res);
         // Console.WriteLine(isParsed + " " + res);
-        // var expression = "-cos(-t)/f(127,001, /dev/null, +(t0)more_errorsb2) - 5";
+        // var expression = "-cos(-t)/f(127,001, dev/null, +(t0)more_errorsb2) - 5";
         Console.WriteLine(expression);
         while (expression != null)
         {
@@ -48,8 +50,10 @@ public static class Program
                 Console.WriteLine(token);
             }
             validator.Reset();
-            expression = Console.ReadLine();
-            
+            var hasErrors = Util.LogErrors();
+            Console.WriteLine("The expression has errors:" + hasErrors);
+            // expression = Console.ReadLine();
+            expression = null;
         }
     }
 }

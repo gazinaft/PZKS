@@ -13,10 +13,12 @@ public class OperationsValidator : ValidatorState
 
     protected override bool Validate(List<Token> tokens)
     {
-        return ValidateDoubleOperations(tokens) &&
-               ValidateBeforeParentheses(tokens) &&
-               ValidateInParentheses(tokens) &&
-               ClosingParentheses(tokens);
+        var test1 = ValidateDoubleOperations(tokens);
+        // var test2 = ValidateBeforeParentheses(tokens);
+        var test3 = ValidateInParentheses(tokens); 
+        var test4 = ClosingParentheses(tokens);
+        var test5 = ValidateOperationsBetweenVariables(tokens);
+        return test1 && test3 && test4 && test5;
     }
     
     private bool ValidateDoubleOperations(List<Token> tokens)
@@ -88,4 +90,24 @@ public class OperationsValidator : ValidatorState
         return success;
     }
 
+    private bool ValidateOperationsBetweenVariables(List<Token> tokens)
+    {
+        var leftProhibited = new List<TokenType> { TokenType.Variable , TokenType.RightParent, TokenType.Number };
+        var rightProhibited = new List<TokenType> { TokenType.Variable , TokenType.Number };
+        var res = true;
+        for (int i = 0; i < tokens.Count - 1; i++)
+        {
+            var lToken = tokens[i].TokenType;
+            var rToken = tokens[i + 1].TokenType;
+            if (leftProhibited.Contains(lToken) && rightProhibited.Contains(rToken)
+                || (rToken == TokenType.LeftParent && lToken is TokenType.Number or TokenType.RightParent))
+            {
+                ReportError("No operation between " + tokens[i] + " " + tokens[i+1]);
+                res = false;
+            }
+        }
+
+        return res;
+    }
+    
 }

@@ -8,19 +8,17 @@ public abstract class ValidatorState
     {
         if (NextState == null)
         {
-            return this.Validate(tokens);
+            return Validate(tokens);
         }
-        return this.Validate(tokens) && NextState.ValidateExpression(tokens);
-    }
-
-    protected void ExecuteNextState(List<Token> tokens)
-    {
-        NextState?.Validate(tokens);
+        var thisVal = Validate(tokens);
+        var nextVal = NextState.ValidateExpression(tokens);
+        
+        return thisVal && nextVal;
     }
 
     protected virtual void ReportError(string message, Token? token = null)
     {
-        Console.WriteLine(message + " " + token?.ToString());
+        Util.ReportError(message + " " + token?.ToString());
     }
     
     public ValidatorState? NextState { get; set; }

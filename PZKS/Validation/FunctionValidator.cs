@@ -24,10 +24,10 @@ public class FunctionValidator : ValidatorState
             
             functionScopes.Add((i + 1, endPar));
         }
-        
-        return CommaInFunctionParentheses(tokens, functionScopes) &&
-            ValidateDoubleComma(tokens);
-        
+
+        var test1 = CommaInFunctionParentheses(tokens, functionScopes);
+        var test2 = ValidateDoubleComma(tokens);
+        return test1 && test2;
     }
 
     private bool ValidateSubexpressions()

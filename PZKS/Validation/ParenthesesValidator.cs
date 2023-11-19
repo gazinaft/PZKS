@@ -7,8 +7,9 @@ public class ParenthesesValidator : ValidatorState
 
     protected override bool Validate(List<Token> tokens)
     {
-        return EmptyParenthesesCheck(tokens) &&
-               OrderAndCountParenthesesCheck(tokens);
+        var test1 = EmptyParenthesesCheck(tokens);
+        var test2 = OrderAndCountParenthesesCheck(tokens);
+        return test1 && test2;
     }
 
     private bool EmptyParenthesesCheck(List<Token> tokens)
