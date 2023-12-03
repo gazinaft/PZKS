@@ -8,5 +8,6 @@ public enum TokenType
     Variable,
     Number,
     Comma,
+    Function,
     Invalid
 }

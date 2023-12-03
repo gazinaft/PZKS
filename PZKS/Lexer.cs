@@ -127,20 +127,20 @@ public class Lexer
         while (IsDigit(Peek(source))) Advance(source);
 
         // Look for a fractional part.
-        if (Peek(source) == ',' && IsDigit(PeekNext(source))) {
-            // Consume the ","
+        if (Peek(source) == '.' && IsDigit(PeekNext(source))) {
+            // Consume the "."
             Advance(source);
 
             while (IsDigit(Peek(source))) Advance(source);
         }
 
         var text = source.Substring(start, current - start);
-        if (!double.TryParse(text, out var res))
-        {
-            Console.WriteLine("Wrong format number at "  + current + " " + source[current - 1]);
-            return;
-        }
-        AddToken(TokenType.Number, text, res);
+        // if (!double.TryParse(text, out var res))
+        // {
+        //     Console.WriteLine("Wrong format number at "  + current + " " + source[current - 1]);
+        //     return;
+        // }
+        AddToken(TokenType.Number, text);
     }
 
     private void ReadVariable(string source)

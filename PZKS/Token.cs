@@ -6,7 +6,7 @@ public class Token
     
     public readonly TokenType TokenType;
     public readonly String Lexeme;
-    public readonly object? Literal;
+    public object? Literal;
     public readonly int Index;
 
     public Token(TokenType tokenType, string lexeme, object? literal, int index)
@@ -20,5 +20,25 @@ public class Token
     public override string ToString()
     {
         return TokenType + " " + Lexeme  + " index: " + Index;
+    }
+
+    public bool IsLowPrioOperation()
+    {
+        return TokenType is TokenType.Minus or TokenType.Plus;
+    }
+    
+    public bool IsHighPrioOperation()
+    {
+        return TokenType is TokenType.Mult or TokenType.Div;
+    }
+
+    public bool IsOperation()
+    {
+        return IsLowPrioOperation() || IsHighPrioOperation();
+    }
+
+    public bool IsValue()
+    {
+        return TokenType is TokenType.Number or TokenType.Variable;
     }
 }
