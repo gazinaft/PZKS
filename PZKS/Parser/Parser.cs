@@ -2,13 +2,6 @@ namespace PZKS.Parser;
 
 public class Parser
 {
-    private static Dictionary<string, int> _operationOrder = new Dictionary<string, int>
-    {
-        {"*", 1},
-        {"/", 1},
-        {"+", 2},
-        {"-", 2}
-    };
 
     private ExpressionNode CreateExpressionNode(Token token)
     {
@@ -42,16 +35,10 @@ public class Parser
         return tokens.Count - 1;
     }
 
-    public ExpressionNode AppendSameOrder(ref ExpressionNode tree, List<Token> tokens, int indexOfNextVar)
-    {
-        var root = new ExpressionNode();
-        return root;
-    }
-
     public ExpressionNode AppendHigherOrder(ref ExpressionNode tree, List<Token> tokens, int startHigherChain)
     {
         var higherTokens =
-            tokens.GetRange(startHigherChain, GetHigherPrioEnd(tokens, startHigherChain) - startHigherChain);
+            tokens.GetRange(startHigherChain, GetHigherPrioEnd(tokens, startHigherChain) - startHigherChain + 1);
         tree.Children.Add(CreateTree(higherTokens));
         return tree;
     }
@@ -64,7 +51,8 @@ public class Parser
         {
             return CreateExpressionNode(tokens[0]);
         }
-        
+
+        var counter = 0;
         switch (tokens[0].TokenType)
         {
             case TokenType.Minus:
@@ -72,25 +60,60 @@ public class Parser
                 root = CreateExpressionNode(tokens[0]);
                 var firstVar = CreateExpressionNode(tokens[1]);
                 root.Children.Add(firstVar);
+                counter = 2;
                 break;
             }
             case TokenType.Plus:
             {
                 root = CreateExpressionNode(tokens[1]);
+                counter = 2;
                 break;
             }
             default:
             {
-                root = CreateExpressionNode(tokens[1]);
-                var firstVar = CreateExpressionNode(tokens[0]);
-                root.Children.Add(firstVar);
+                root = CreateExpressionNode(tokens[0]);
+                counter = 1;
                 break;
             }
         }
 
-        for (int i = 0; i < tokens.Count; i++)
+        var firstOperation = CreateExpressionNode(tokens[counter]);
+        firstOperation.Children.Add(root);
+        root = firstOperation;
+        counter++;
+        
+        while (counter < tokens.Count)
         {
-            // if ()
+            var currentValue = CreateExpressionNode(tokens[counter]);
+            if (counter == tokens.Count - 1) // last token, guaranteed variable
+            {
+                root.Children.Add(currentValue);
+                break;
+            }
+
+            var isOperation = currentValue.IsOperation();
+            
+            if (isOperation) // means operation is low Or Same Prio
+            {
+                currentValue.Children.Add(root);
+                root = currentValue;
+                counter++;
+                continue;
+            }
+
+            var nextOperation = CreateExpressionNode(tokens[counter + 1]);
+
+            if (nextOperation.IsHigherOrder() && root.IsLowerOrder())
+            {
+                root = AppendHigherOrder(ref root, tokens, counter);
+                counter = GetHigherPrioEnd(tokens, counter);
+            }
+            else
+            {
+                root.Children.Add(currentValue);
+            }
+            
+            counter++;
         }
 
         return root;

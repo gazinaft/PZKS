@@ -9,7 +9,7 @@ public class Token
     public object? Literal;
     public readonly int Index;
 
-    public Token(TokenType tokenType, string lexeme, object? literal, int index)
+    public Token(TokenType tokenType, string lexeme, object? literal = null, int index = 0)
     {
         TokenType = tokenType;
         Lexeme = lexeme;

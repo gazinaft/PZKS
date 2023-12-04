@@ -19,4 +19,15 @@ public class ExpressionNode
     {
         return NodeToken.IsOperation();
     }
+
+    public bool IsHigherOrder()
+    {
+        return NodeToken.IsHighPrioOperation();
+    }
+    
+    public bool IsLowerOrder()
+    {
+        return NodeToken.IsLowPrioOperation();
+    }
+    
 }
