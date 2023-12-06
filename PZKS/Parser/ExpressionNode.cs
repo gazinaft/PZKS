@@ -4,6 +4,7 @@ public class ExpressionNode
 {
     public List<ExpressionNode> Children = new List<ExpressionNode>();
     public Token NodeToken;
+    public ExpressionNode? Parent;
 
     public bool IsLeaf()
     {

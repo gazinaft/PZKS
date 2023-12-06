@@ -16,6 +16,8 @@ public static class Program
 {
     public static void Main()
     {
+        Console.WriteLine(1/2);
+        return;
         var lexer = new Lexer();
         var validator = new ValidatorStateMachine();
         var start = new StartValidator();

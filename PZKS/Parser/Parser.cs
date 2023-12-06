@@ -17,9 +17,15 @@ public class Parser
 
         var functionName = token.Lexeme.TakeWhile(x => x != '(').ToString();
         var rootToken = new Token(TokenType.Variable, functionName ?? "function", null, 0);
+        var rootNode = new ExpressionNode { NodeToken = rootToken };
         var subtrees = subExpressions.Select(CreateTree).ToList();
+        foreach (var subtree in subtrees)
+        {
+            subtree.Parent = rootNode;
+        }
+        rootNode.Children = subtrees;
         
-        return new ExpressionNode { NodeToken = rootToken, Children = subtrees };
+        return rootNode;
     }
 
     public int GetHigherPrioEnd(List<Token> tokens, int start)
@@ -39,7 +45,10 @@ public class Parser
     {
         var higherTokens =
             tokens.GetRange(startHigherChain, GetHigherPrioEnd(tokens, startHigherChain) - startHigherChain + 1);
-        tree.Children.Add(CreateTree(higherTokens));
+        var higherExpression = CreateTree(higherTokens);
+        tree.Children.Add(higherExpression);
+        higherExpression.Parent = tree;
+        
         return tree;
     }
     
@@ -60,6 +69,7 @@ public class Parser
                 root = CreateExpressionNode(tokens[0]);
                 var firstVar = CreateExpressionNode(tokens[1]);
                 root.Children.Add(firstVar);
+                firstVar.Parent = root;
                 counter = 2;
                 break;
             }
@@ -76,11 +86,6 @@ public class Parser
                 break;
             }
         }
-
-        var firstOperation = CreateExpressionNode(tokens[counter]);
-        firstOperation.Children.Add(root);
-        root = firstOperation;
-        counter++;
         
         while (counter < tokens.Count)
         {
@@ -88,6 +93,7 @@ public class Parser
             if (counter == tokens.Count - 1) // last token, guaranteed variable
             {
                 root.Children.Add(currentValue);
+                currentValue.Parent = root;
                 break;
             }
 
@@ -96,6 +102,7 @@ public class Parser
             if (isOperation) // means operation is low Or Same Prio
             {
                 currentValue.Children.Add(root);
+                root.Parent = currentValue;
                 root = currentValue;
                 counter++;
                 continue;
@@ -111,6 +118,7 @@ public class Parser
             else
             {
                 root.Children.Add(currentValue);
+                currentValue.Parent = root;
             }
             
             counter++;
