@@ -206,12 +206,72 @@ public class Balancer
 
         return false;
     }
+
+    public bool FixImbalanceNonCommutative(ref ExpressionNode tree, TokenType tokenType)
+    {
+        var antitokenType = tokenType switch
+        {
+            TokenType.Minus => TokenType.Plus,
+            TokenType.Div => TokenType.Mult, 
+            _ => throw new Exception("the type of operation must be - or /")
+        };
+        // leaf
+        if (tree.IsLeaf())
+        {
+            return false;
+        }
+        
+        // imbalance
+        if (IsStartOfUnbalancedSubtree(tree, tokenType))
+        {
+            var leafs = GetChildrenOfUnbalancedTree(tree, tokenType);
+            var NonCommutativePart = leafs[0];
+            leafs.RemoveAt(0);
+            var newRoot = CreateOperationNode(tokenType);
+            newRoot.Children.Add(NonCommutativePart);
+            var childrenCount = GetMonotoneChildrenCount(tree, tokenType);
+            var balancedTree = BalancedExpressionTreeOfType(antitokenType, childrenCount - 1);
+            int counter = 0;
+            balancedTree = FillExpressionNode(ref balancedTree, ref leafs, ref counter);
+            newRoot.Children.Add(balancedTree);
+            balancedTree.Parent = newRoot;
+            if (tree.Parent != null)
+            {
+                var indexOfTree = tree.Parent.Children.IndexOf(tree);
+                newRoot.Parent = tree.Parent;
+                tree.Parent.Children[indexOfTree] = newRoot;
+                tree.Parent = null;
+            }
+            tree = newRoot;
+            return true;
+        }
+
+        foreach (var treeChild in tree.Children)
+        {
+            var expressionNode = treeChild;
+            var bFixedTree = FixImbalanceNonCommutative(ref expressionNode, tokenType);
+            if (bFixedTree) return true;
+        }
+
+        return false;
+    }
     
     public ExpressionNode BalancePlusOrMult(ref ExpressionNode tree, TokenType tokenType)
     {
         while (true)
         {
             var bHasFixedTree = FixImbalance(ref tree, tokenType);
+            if (!bHasFixedTree) break;
+        }
+
+        return tree;
+    }
+
+    public ExpressionNode BalanceMinusOrDiv(ref ExpressionNode tree, TokenType tokenType)
+    {
+        while (true)
+        {
+            var bHasFixedTree = FixImbalanceNonCommutative(ref tree, tokenType);
             if (!bHasFixedTree) break;
         }
 
