@@ -36,7 +36,7 @@ public class Balancer
 
     private static int BalancedTreeHeight(int numberOfNodes)
     {
-        return (int)(Math.Log2(numberOfNodes) + 1);
+        return (int)(Math.Log2(numberOfNodes));
     }
 
     private int GetMonotoneChildrenHeight(ExpressionNode node, TokenType type)
@@ -54,7 +54,7 @@ public class Balancer
             }
         }
 
-        return heights.Max();
+        return heights.Count == 0 ? 0 : heights.Max();
     }
     
     private int GetMonotoneChildrenCount(ExpressionNode node, TokenType tokenType)
@@ -71,11 +71,10 @@ public class Balancer
                 count.Add(0);
             }
         }
-
-        return count.Sum();
+        return count.Count == 0 ? 0 : count.Sum();
     }
 
-    private ExpressionNode BalancedExpressionTreeOfType(TokenType tokenType, int countOfNodes)
+    public ExpressionNode BalancedExpressionTreeOfType(TokenType tokenType, int countOfNodes)
     {
         if (countOfNodes == 1)
         {
@@ -121,22 +120,16 @@ public class Balancer
         return result;
     }
 
-    private ExpressionNode FillExpressionNode(ref ExpressionNode node, ref List<ExpressionNode> leafChildren)
+    private ExpressionNode FillExpressionNode(ref ExpressionNode node, ref List<ExpressionNode> leafChildren, ref int currentIndex)
     {
         foreach (var nodeChild in node.Children)
         {
-            throw new Exception("Bad inserting");
-            if (nodeChild.IsLeaf())
+            while (nodeChild.Children.Count < 2)
             {
-                var leaf1 = leafChildren[0];
+                var leaf1 = leafChildren[currentIndex];
                 nodeChild.Children.Add(leaf1);
                 leaf1.Parent = nodeChild;
-                leafChildren.RemoveAt(0);
-                
-                var leaf2 = leafChildren[0];
-                nodeChild.Children.Add(leaf2);
-                leaf2.Parent = nodeChild;
-                leafChildren.RemoveAt(0);
+                currentIndex++;
             }
         }
 
@@ -149,56 +142,52 @@ public class Balancer
                && (node.Parent == null || node.Parent.NodeToken.TokenType != tokenType);
     }
 
-    private (bool, ExpressionNode?) FixImbalance(ref ExpressionNode tree, TokenType tokenType)
+    private bool FixImbalance(ref ExpressionNode tree, TokenType tokenType)
     {
+        // leaf
+        if (tree.IsLeaf())
+        {
+            return false;
+        }
+        
+        // imbalance
         if (IsStartOfUnbalancedSubtree(tree, tokenType))
         {
             var leafs = GetChildrenOfUnbalancedTree(tree);
             var childrenCount = GetMonotoneChildrenCount(tree, tokenType);
             var balancedTree = BalancedExpressionTreeOfType(tokenType, childrenCount);
-            balancedTree = FillExpressionNode(ref balancedTree, ref leafs);
+            int counter = 0;
+            balancedTree = FillExpressionNode(ref balancedTree, ref leafs, ref counter);
             if (tree.Parent != null)
             {
                 var indexOfTree = tree.Parent.Children.IndexOf(tree);
                 tree.Parent.Children[indexOfTree] = balancedTree;
                 balancedTree.Parent = tree.Parent;
                 tree.Parent = null;
-                return (true, null);
             }
-            
-            return (true, balancedTree);
-        }
-
-        if (tree.IsLeaf())
-        {
-            return (false, null);
+            tree = balancedTree;
+            return true;
         }
 
         foreach (var treeChild in tree.Children)
         {
             var expressionNode = treeChild;
-            var (bFixedTree, fixedTree) = FixImbalance(ref expressionNode, tokenType);
-            if (bFixedTree) return (true, fixedTree);
+            var bFixedTree = FixImbalance(ref expressionNode, tokenType);
+            if (bFixedTree) return true;
         }
 
-        return (false, null);
+        return false;
     }
     
-    ExpressionNode BalancePlusOrMult(ref ExpressionNode tree, TokenType tokenType)
+    public ExpressionNode BalancePlusOrMult(ref ExpressionNode tree, TokenType tokenType)
     {
         while (true)
         {
-            var (bHasFixedTree, fixedTree) = FixImbalance(ref tree, tokenType);
-            if (bHasFixedTree && fixedTree != null)
-            {
-                tree = fixedTree;
-            }
+            var bHasFixedTree = FixImbalance(ref tree, tokenType);
             if (!bHasFixedTree) break;
         }
 
         return tree;
     }
-
-    
     
 }
