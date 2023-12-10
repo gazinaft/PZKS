@@ -16,7 +16,7 @@ public abstract class ValidatorState
         return thisVal && nextVal;
     }
 
-    protected virtual void ReportError(string message, Token? token = null)
+    protected void ReportError(string message, Token? token = null)
     {
         Util.ReportError(message + " " + token?.ToString());
     }

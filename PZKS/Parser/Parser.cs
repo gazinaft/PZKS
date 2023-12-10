@@ -100,9 +100,19 @@ public class Parser
 
             var isOperation = currentValue.IsOperation();
             var isLeaf = currentValue.IsLeaf();
+            var nextOperation = CreateExpressionNode(tokens[counter + 1]);
+            
+            if (nextOperation.IsHigherOrder() && root.IsLowerOrder())
+            {
+                root = AppendHigherOrder(ref root, tokens, counter);
+                counter = GetHigherPrioEnd(tokens, counter);
+                counter++;
+                continue;
+            }
 
             if (!isLeaf)
             {
+             
                 root.Children.Add(currentValue);
                 currentValue.Parent = root;
                 counter++;
@@ -117,19 +127,9 @@ public class Parser
                 counter++;
                 continue;
             }
-
-            var nextOperation = CreateExpressionNode(tokens[counter + 1]);
-
-            if (nextOperation.IsHigherOrder() && root.IsLowerOrder())
-            {
-                root = AppendHigherOrder(ref root, tokens, counter);
-                counter = GetHigherPrioEnd(tokens, counter);
-            }
-            else
-            {
-                root.Children.Add(currentValue);
-                currentValue.Parent = root;
-            }
+            
+            root.Children.Add(currentValue);
+            currentValue.Parent = root;
             
             counter++;
         }

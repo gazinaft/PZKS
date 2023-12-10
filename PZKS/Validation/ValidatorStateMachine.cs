@@ -16,7 +16,7 @@ public class ValidatorStateMachine
         validator.Validate(tokens);
     }
     
-    public void Validate(List<Token> tokens)
+    public bool Validate(List<Token> tokens)
     {
         var subexpressions = Util.GetSubexpressions(tokens);
         foreach (var subexpression in subexpressions)
@@ -25,10 +25,9 @@ public class ValidatorStateMachine
         }
         if (State != null)
         {
-            State.ValidateExpression(tokens);
-            return;
+            return State.ValidateExpression(tokens);;
         }
-        StartState?.ValidateExpression(tokens);
+        return StartState?.ValidateExpression(tokens) ?? false;
     }
 
     public void Reset()

@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using PZKS.Parser;
 using PZKS.Validation;
 
 namespace PZKS;
@@ -39,38 +40,23 @@ public static class Program
 
         // var isParsed = double.TryParse("12,3", out double res);
         // Console.WriteLine(isParsed + " " + res);
-        var expression = "func(b, k(c * 1, c - (2 + 3), 10) + 1)";
+        var expression = "1 + 1 + 1 + 1";
         Console.WriteLine(expression);
         var tokens1 = lexer.Scan(expression);
         var squashed = Util.TransformPreTree(tokens1);
         var subExpressions = (List<List<Token>>)squashed[0].Literal;
         Console.WriteLine(subExpressions);
-        // Console.WriteLine(squashed[0].ToString());
-        // var innerTokens = (List<List<Token>>)squashed[0].Literal!;
-        // Console.WriteLine(innerTokens.Count);
-        // int i = 1;
-        //
-        // foreach (var tokenlist in innerTokens)
-        // {
-        //     Console.WriteLine("Start of token " + i);
-        //     foreach (var token in tokenlist)
-        //     {
-        //         Console.WriteLine(token.ToString());
-        //     }
-        //     i++;
-        //
-        // }
 
         var parser = new Parser.Parser();
+        var balancer = new Balancer();
         var tree = parser.CreateTree(squashed);
+        // var tree = balancer.BalancePlusOrMult(ref unbalanced, TokenType.Plus);
+        // var tree = balancer.BalancedExpressionTreeOfType(TokenType.Plus, 7);
         Console.WriteLine(tree.ToString());
         Console.WriteLine(tree.Children[0].ToString());
         Console.WriteLine(tree.Children[1].ToString());
-        Console.WriteLine(tree.Children[1].Children[0].ToString());
-        // Console.WriteLine(tree.Children[0].Children[0].ToString());
-        // Console.WriteLine(tree.Children[0].Children[1].ToString());
-        // Console.WriteLine(tree.Children[0].Children[1].Children[0].ToString());
-
+        // Console.WriteLine(tree.Children[1].Children[0].ToString());
+        
         return;
         while (expression != null)
         {

@@ -22,7 +22,8 @@ public class Balancer
         return new ExpressionNode { NodeToken = new Token(TokenType.Div, "/") };
     }
 
-    private ExpressionNode CreateOperationNode(TokenType type)
+    /// correct
+    public ExpressionNode CreateOperationNode(TokenType type)
     {
         return type switch
         {
@@ -34,14 +35,20 @@ public class Balancer
         };
     }
 
-    private static int BalancedTreeHeight(int numberOfNodes)
+    /// correct
+    public static int BalancedTreeHeight(int numberOfNodes)
     {
         return (int)(Math.Log2(numberOfNodes));
     }
 
-    private int GetMonotoneChildrenHeight(ExpressionNode node, TokenType type)
+    /// correct
+    public int GetMonotoneChildrenHeight(ExpressionNode node, TokenType type)
     {
         var heights = new List<int>();
+        if (type != node.NodeToken.TokenType)
+        {
+            return 0;
+        }
         foreach (var nodeChild in node.Children)
         {
             if (nodeChild.NodeToken.TokenType == type)
@@ -57,23 +64,29 @@ public class Balancer
         return heights.Count == 0 ? 0 : heights.Max();
     }
     
-    private int GetMonotoneChildrenCount(ExpressionNode node, TokenType tokenType)
+    /// correct
+    public int GetMonotoneChildrenCount(ExpressionNode node, TokenType tokenType)
     {
         var count = new List<int>();
+        if (node.NodeToken.TokenType != tokenType)
+        {
+            return 1;
+        }
         foreach (var nodeChild in node.Children)
         {
             if (nodeChild.NodeToken.TokenType == tokenType)
             {
-                count.Add(1 + GetMonotoneChildrenCount(nodeChild, tokenType));
+                count.Add(GetMonotoneChildrenCount(nodeChild, tokenType));
             }
             else
             {
                 count.Add(0);
             }
         }
-        return count.Count == 0 ? 0 : count.Sum();
+        return count.Count == 0 ? 1 : count.Sum() + 1;
     }
 
+    /// correct
     public ExpressionNode BalancedExpressionTreeOfType(TokenType tokenType, int countOfNodes)
     {
         if (countOfNodes == 1)
@@ -101,10 +114,11 @@ public class Balancer
         return root;
     }
 
-    private List<ExpressionNode> GetChildrenOfUnbalancedTree(ExpressionNode node)
+    /// correct
+    public List<ExpressionNode> GetChildrenOfUnbalancedTree(ExpressionNode node, TokenType type)
     {
-        var type = node.NodeToken.TokenType;
         var result = new List<ExpressionNode>();
+        if (type != node.NodeToken.TokenType) return result;
         foreach (var nodeChild in node.Children)
         {
             if (nodeChild.NodeToken.TokenType != type)
@@ -113,36 +127,50 @@ public class Balancer
             }
             else
             {
-                result.AddRange(GetChildrenOfUnbalancedTree(nodeChild));
+                result.AddRange(GetChildrenOfUnbalancedTree(nodeChild, type));
             }
         }
 
         return result;
     }
 
-    private ExpressionNode FillExpressionNode(ref ExpressionNode node, ref List<ExpressionNode> leafChildren, ref int currentIndex)
+    /// seems correct
+    public ExpressionNode FillExpressionNode(ref ExpressionNode node, ref List<ExpressionNode> leafChildren, ref int currentIndex)
     {
-        foreach (var nodeChild in node.Children)
+        // if (leafChildren.Contains(node)) return node;
+        for (var index = 0; index < node.Children.Count; index++)
         {
-            while (nodeChild.Children.Count < 2)
+            var nodeChild = node.Children[index];
+            var addedCount = 0;
+            while (nodeChild.Children.Count < 2 && currentIndex < leafChildren.Count && nodeChild.IsOperation())
             {
                 var leaf1 = leafChildren[currentIndex];
                 nodeChild.Children.Add(leaf1);
                 leaf1.Parent = nodeChild;
                 currentIndex++;
+                addedCount++;
+            }
+
+            if (addedCount < 2)
+            {
+                FillExpressionNode(ref nodeChild, ref leafChildren, ref currentIndex);
             }
         }
-
+        
         return node;
     }
     
-    private bool IsStartOfUnbalancedSubtree(ExpressionNode node, TokenType tokenType)
+    
+    public bool IsStartOfUnbalancedSubtree(ExpressionNode node, TokenType tokenType)
     {
-        return GetMonotoneChildrenHeight(node, tokenType) > BalancedTreeHeight(GetMonotoneChildrenCount(node, tokenType))
-               && (node.Parent == null || node.Parent.NodeToken.TokenType != tokenType);
+        var height = GetMonotoneChildrenHeight(node, tokenType);
+        var count = GetMonotoneChildrenCount(node, tokenType);
+        var balancedHeight = BalancedTreeHeight(count); 
+        var start = (node.Parent == null || node.Parent.NodeToken.TokenType != tokenType);
+        return height > balancedHeight && start;
     }
 
-    private bool FixImbalance(ref ExpressionNode tree, TokenType tokenType)
+    public bool FixImbalance(ref ExpressionNode tree, TokenType tokenType)
     {
         // leaf
         if (tree.IsLeaf())
@@ -153,7 +181,7 @@ public class Balancer
         // imbalance
         if (IsStartOfUnbalancedSubtree(tree, tokenType))
         {
-            var leafs = GetChildrenOfUnbalancedTree(tree);
+            var leafs = GetChildrenOfUnbalancedTree(tree, tokenType);
             var childrenCount = GetMonotoneChildrenCount(tree, tokenType);
             var balancedTree = BalancedExpressionTreeOfType(tokenType, childrenCount);
             int counter = 0;

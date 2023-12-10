@@ -110,7 +110,7 @@ public static class Util
         for (var i = 0; i < tokens.Count; i++)
         {
             bool isFunction = false;
-            if (IsFunction(tokens, i))
+            if (IsFunction(tokens, i) && tokens[i].TokenType == TokenType.Variable)
             {
                 isFunction = true;
                 i++;
@@ -171,16 +171,11 @@ public static class Util
         _errors.Add(error);
     }
 
-    public static bool LogErrors()
+    public static List<string> LogErrors()
     {
-        foreach (var error in _errors)
-        {
-            Console.WriteLine(error);
-        }
-
-        var hasErrors = _errors.Count > 0;
+        var result = _errors.ToList();
         _errors.Clear();
-        return hasErrors;
+        return result;
     }
 
     public static int GetTokenWeight(List<Token> tokens, int tokenIndex)
