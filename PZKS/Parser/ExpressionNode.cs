@@ -30,5 +30,9 @@ public class ExpressionNode
     {
         return NodeToken.IsLowPrioOperation();
     }
-    
+
+    public override string ToString()
+    { 
+        return NodeToken.Lexeme;
+    }
 }

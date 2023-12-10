@@ -15,7 +15,8 @@ public class Parser
             return CreateTree(subExpressions[0]);
         }
 
-        var functionName = token.Lexeme.TakeWhile(x => x != '(').ToString();
+        var functionChars = token.Lexeme.TakeWhile(x => x != '(');
+        var functionName = functionChars.Aggregate("", (current, funcchar) => current + funcchar);
         var rootToken = new Token(TokenType.Variable, functionName ?? "function", null, 0);
         var rootNode = new ExpressionNode { NodeToken = rootToken };
         var subtrees = subExpressions.Select(CreateTree).ToList();
@@ -98,6 +99,15 @@ public class Parser
             }
 
             var isOperation = currentValue.IsOperation();
+            var isLeaf = currentValue.IsLeaf();
+
+            if (!isLeaf)
+            {
+                root.Children.Add(currentValue);
+                currentValue.Parent = root;
+                counter++;
+                continue;
+            }
             
             if (isOperation) // means operation is low Or Same Prio
             {

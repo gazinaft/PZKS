@@ -89,6 +89,10 @@ public static class Util
         var startSubexpression = start;
         for (int i = start; i < end; i++)
         {
+            if (IsFunction(tokens, i) && tokens[i].TokenType == TokenType.Variable)
+            {
+                i = GetClosingPar(tokens, i + 1);
+            }
             if (tokens[i].TokenType == TokenType.Comma)
             {
                 result.Add((startSubexpression, i - 1));
@@ -245,10 +249,10 @@ public static class Util
                     subexpressions.Add(SquashFunctions(tokens.GetRange(startSub, endSub - startSub + 1)));
                 }
                 
-                var squashedTokensToStringify = tokens.GetRange(i, endParent - i + 2); 
+                var squashedTokensToStringify = tokens.GetRange(i, endParent - i + 1); 
                 var squashed = new Token(TokenType.Variable, StringifyTokens(squashedTokensToStringify), subexpressions, i);
                 result.Add(squashed);
-                i = endParent + 1;
+                i = endParent;
             }
             else
             {
@@ -280,7 +284,7 @@ public static class Util
 
                 var squashed = new Token(TokenType.Variable, StringifyTokens(subexpression), subexpressions, i);
                 result.Add(squashed);
-                i = endParent + 1;
+                i = endParent;
             }
             else
             {

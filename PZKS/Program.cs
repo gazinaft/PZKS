@@ -16,8 +16,6 @@ public static class Program
 {
     public static void Main()
     {
-        Console.WriteLine(1/2);
-        return;
         var lexer = new Lexer();
         var validator = new ValidatorStateMachine();
         var start = new StartValidator();
@@ -41,8 +39,39 @@ public static class Program
 
         // var isParsed = double.TryParse("12,3", out double res);
         // Console.WriteLine(isParsed + " " + res);
-        var expression = "(12()(dasdasdadasdasdasd))";
+        var expression = "func(b, k(c * 1, c - (2 + 3), 10) + 1)";
         Console.WriteLine(expression);
+        var tokens1 = lexer.Scan(expression);
+        var squashed = Util.TransformPreTree(tokens1);
+        var subExpressions = (List<List<Token>>)squashed[0].Literal;
+        Console.WriteLine(subExpressions);
+        // Console.WriteLine(squashed[0].ToString());
+        // var innerTokens = (List<List<Token>>)squashed[0].Literal!;
+        // Console.WriteLine(innerTokens.Count);
+        // int i = 1;
+        //
+        // foreach (var tokenlist in innerTokens)
+        // {
+        //     Console.WriteLine("Start of token " + i);
+        //     foreach (var token in tokenlist)
+        //     {
+        //         Console.WriteLine(token.ToString());
+        //     }
+        //     i++;
+        //
+        // }
+
+        var parser = new Parser.Parser();
+        var tree = parser.CreateTree(squashed);
+        Console.WriteLine(tree.ToString());
+        Console.WriteLine(tree.Children[0].ToString());
+        Console.WriteLine(tree.Children[1].ToString());
+        Console.WriteLine(tree.Children[1].Children[0].ToString());
+        // Console.WriteLine(tree.Children[0].Children[0].ToString());
+        // Console.WriteLine(tree.Children[0].Children[1].ToString());
+        // Console.WriteLine(tree.Children[0].Children[1].Children[0].ToString());
+
+        return;
         while (expression != null)
         {
             var tokens = lexer.Scan(expression);
