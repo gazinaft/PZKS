@@ -10,6 +10,7 @@ public class EndValidator : ValidatorState
     protected override bool Validate(List<Token> tokens)
     {
         bool success = true;
+        if (tokens.Count == 0) return false;
         var lastToken = tokens[^1];
         if (ForbiddenSymbols.Contains(lastToken.TokenType))
         {

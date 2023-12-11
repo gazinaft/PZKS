@@ -273,7 +273,7 @@ public static class Util
             if (tokens[i].TokenType == TokenType.LeftParent)
             {
                 List<List<Token>> subexpressions = new();
-                var endParent = GetClosingPar(tokens, i + 1);
+                var endParent = GetClosingPar(tokens, i);
                 var subexpression = tokens.GetRange(i + 1, endParent - i - 1);
                 subexpressions.Add(SquashParentheses(subexpression));
 

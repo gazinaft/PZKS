@@ -7,8 +7,12 @@ public class StartValidator : ValidatorState
     
     protected override bool Validate(List<Token> tokens)
     {
+        if (tokens.Count == 0)
+        {
+            ReportError("Empty expression");
+            return false;
+        }
         if (!ForbiddenSymbols.Contains(tokens[0].TokenType)) return true;
-        
         ReportError("Invalid token at the start of the expression", tokens[0]);
         return false;
     }
