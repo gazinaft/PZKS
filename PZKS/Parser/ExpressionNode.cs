@@ -12,6 +12,21 @@ public class ExpressionNode
         return Children.Count == 0;
     }
 
+    public ExpressionNode DeepCopy()
+    {
+        var result = new ExpressionNode();
+        result.NodeToken = NodeToken;
+        result._isCalculated = _isCalculated;
+        result.CalculatedSource = CalculatedSource;
+        result.Children = Children.Select(x => x.DeepCopy()).ToList();
+        foreach (var resultChild in result.Children)
+        {
+            resultChild.Parent = result;
+        }
+        
+        return result;
+    }
+    
     public bool IsFunction()
     {
         return NodeToken.TokenType == TokenType.Variable && !IsLeaf();
