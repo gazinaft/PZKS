@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using PZKS.MatrixSystem;
 using PZKS.Parser;
 using PZKS.Validation;
 
@@ -40,7 +41,7 @@ public static class Program
 
         // var isParsed = double.TryParse("12,3", out double res);
         // Console.WriteLine(isParsed + " " + res);
-        var expression = "1 + 1 + 1 + 1";
+        var expression = "a*b*c/d + e*f*g/h + t*(a-q) - 5.0*i - 4*j + k + L + m*n*k*(p-1) + sin*(pi*R)*log*(q)/sin*(3*pi/4 + x*pi/2)";
         Console.WriteLine(expression);
         var tokens1 = lexer.Scan(expression);
         var squashed = Util.TransformPreTree(tokens1);
@@ -49,14 +50,16 @@ public static class Program
 
         var parser = new Parser.Parser();
         var balancer = new Balancer();
-        var tree = parser.CreateTree(squashed);
-        // var tree = balancer.BalancePlusOrMult(ref unbalanced, TokenType.Plus);
+        var unbalanced = parser.CreateTree(squashed);
+        var tree = balancer.BalancePlusOrMult(ref unbalanced, TokenType.Plus);
         // var tree = balancer.BalancedExpressionTreeOfType(TokenType.Plus, 7);
-        Console.WriteLine(tree.ToString());
-        Console.WriteLine(tree.Children[0].ToString());
-        Console.WriteLine(tree.Children[1].ToString());
+        // var matrix = new MatrixSystem.MatrixSystem(tree);
+        var sysEval = new SystemEvaluator(unbalanced);
+        var optimal = sysEval.GetOptimalSystem();
+        var bestTree = optimal.GetTree();
+        Console.WriteLine(sysEval.GetAllStats());
         // Console.WriteLine(tree.Children[1].Children[0].ToString());
-        
+        Console.WriteLine(bestTree);
         return;
         while (expression != null)
         {

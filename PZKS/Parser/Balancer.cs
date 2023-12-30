@@ -255,6 +255,16 @@ public class Balancer
 
         return false;
     }
+
+    public ExpressionNode BalanceTree(ref ExpressionNode tree, TokenType tokenType)
+    {
+        return tokenType switch
+        {
+            TokenType.Plus or TokenType.Mult => BalancePlusOrMult(ref tree, tokenType),
+            TokenType.Div or TokenType.Minus => BalanceMinusOrDiv(ref tree, tokenType),
+            _ => tree
+        };
+    }
     
     public ExpressionNode BalancePlusOrMult(ref ExpressionNode tree, TokenType tokenType)
     {

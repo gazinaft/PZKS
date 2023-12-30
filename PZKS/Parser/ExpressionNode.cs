@@ -7,6 +7,14 @@ public class ExpressionNode
     public ExpressionNode? Parent;
     private bool _isCalculated;
     public int CalculatedSource = 0;
+    private static int _currentNumber = 0;
+    public string Name;
+
+    public ExpressionNode()
+    {
+        Name = "P[" + ++_currentNumber + "]";
+    }
+    
     public bool IsLeaf()
     {
         return Children.Count == 0;
@@ -49,7 +57,7 @@ public class ExpressionNode
 
     public override string ToString()
     { 
-        return NodeToken.Lexeme;
+        return Name + " " + NodeToken.Lexeme;
     }
     
     public bool IsCalculated
