@@ -58,6 +58,7 @@ public static class Program
         var optimal = sysEval.GetOptimalSystem();
         var bestTree = optimal.GetTree();
         Console.WriteLine(sysEval.GetAllStats());
+        Console.WriteLine(optimal.ToString());
         // Console.WriteLine(tree.Children[1].Children[0].ToString());
         Console.WriteLine(bestTree);
         return;

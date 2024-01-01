@@ -75,7 +75,7 @@ public class MatrixSystem
     {
         if (!MatrixHosts.ContainsKey(host)) return 0;
         
-        float total = MatrixHosts[host].Count;
+        float total = _currentPointer;
         float working = MatrixHosts[host].Count(x => (x.State & SysState.Execute) > 0);
         return working / total;
     }
@@ -88,7 +88,7 @@ public class MatrixSystem
     public float GetAcceleration()
     {
         float sumLinearTime = MatrixHosts.Keys.Sum(GetHostWorkingTime);
-        float parallelTime = FirstEmptyPositionAtHost(1);
+        float parallelTime = _currentPointer;
         return sumLinearTime / parallelTime;
     }
 
@@ -175,32 +175,7 @@ public class MatrixSystem
         
         return largestGroup;
     }
-    // private void GraphSearch(List<ExpressionNode> expressionNodes)
-    // {
-    //     if (expressionNodes.Count == 0) return;
-    //     var grouped = expressionNodes.GroupBy(x => x.NodeToken.TokenType);
-    //     foreach (var tokenGroup in grouped)
-    //     {
-    //         var nodesInGroup = tokenGroup.ToList();
-    //         if (nodesInGroup.Count == 1)
-    //         {
-    //             var node = nodesInGroup[0];
-    //
-    //             for (int i = 1; i <= 2; i++)
-    //             {
-    //                 var system1 = DeepCopy();
-    //                 int cost1 = CostOfOperation(node, i);
-    //                 system1.FillSendReceive(i, cost1);
-    //                 system1._currentPointer += cost1;
-    //                 system1.FillExecutionForOne(node, i);
-    //                 system1._currentPointer += OperationLength[node.NodeToken.TokenType];
-    //                 system1.GraphSearch(system1.GetNodesCanBeCalculated(ref system1._tree));
-    //             }
-    //         }
-    //     }
-    //     _searchOptimalMatrixSystems.Remove(this);
-    //
-    // }
+    
     private float CostOfOperations(ExpressionNode node1, ExpressionNode node2)
     {
         return CostOfOperation(node1, 1) + CostOfOperation(node2, 2) - (node1.Parent == node2.Parent ? 0.5f : 0f);
