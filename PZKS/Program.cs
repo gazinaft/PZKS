@@ -34,34 +34,32 @@ public static class Program
 
         // parse as expressions func arguments
         // parentheses between variables
-        // var expression = "-cos(-&t))/(*(*f)(127.0.0.1, /dev/null/, (t==0)?4more_errors:b^2) - .5";
+        var expression = "-cos(-&t))/(*(*f)(127.0.0.1, /dev/null/, (t==0)?4more_errors:b^2) - .5";
         // var expression = "-cos(-t)/f(127,001, dev/null, (t0)+4*more_errorsb2) - 5";
         // var expression = "-cos(-t)/f(127001, dev/null, (t0)*4*more_errorsb2) - 5";
         // var expression = "a*b*c + m*a*b + a*c - a*smnj*k/m + m";
 
         // var isParsed = double.TryParse("12,3", out double res);
         // Console.WriteLine(isParsed + " " + res);
-        var expression = "a*b*c/d + e*f*g/h + t*(a-q) - 5.0*i - 4*j + k + L + m*n*k*(p-1) + sin*(pi*R)*log*(q)/sin*(3*pi/4 + x*pi/2)";
+        // var expression = "a*b*c/d + e*f*g/h + t*(a-q) - 5.0*i - 4*j + k + L + m*n*k*(p-1) + sin*(pi*R)*log*(q)/sin*(3*pi/4 + x*pi/2)";
         Console.WriteLine(expression);
-        var tokens1 = lexer.Scan(expression);
-        var squashed = Util.TransformPreTree(tokens1);
-        var subExpressions = (List<List<Token>>)squashed[0].Literal;
-        Console.WriteLine(subExpressions);
-
-        var parser = new Parser.Parser();
-        var balancer = new Balancer();
-        var unbalanced = parser.CreateTree(squashed);
-        var tree = balancer.BalancePlusOrMult(ref unbalanced, TokenType.Plus);
-        // var tree = balancer.BalancedExpressionTreeOfType(TokenType.Plus, 7);
-        // var matrix = new MatrixSystem.MatrixSystem(tree);
-        var sysEval = new SystemEvaluator(unbalanced);
-        var optimal = sysEval.GetOptimalSystem();
-        var bestTree = optimal.GetTree();
-        Console.WriteLine(sysEval.GetAllStats());
-        Console.WriteLine(optimal.ToString());
-        // Console.WriteLine(tree.Children[1].Children[0].ToString());
-        Console.WriteLine(bestTree);
-        return;
+        // var squashed = Util.TransformPreTree(tokens1);
+        // var subExpressions = (List<List<Token>>)squashed[0].Literal;
+        // Console.WriteLine(subExpressions);
+        //
+        // var parser = new Parser.Parser();
+        // var balancer = new Balancer();
+        // var unbalanced = parser.CreateTree(squashed);
+        // var tree = balancer.BalancePlusOrMult(ref unbalanced, TokenType.Plus);
+        // // var tree = balancer.BalancedExpressionTreeOfType(TokenType.Plus, 7);
+        // // var matrix = new MatrixSystem.MatrixSystem(tree);
+        // var sysEval = new SystemEvaluator(unbalanced);
+        // var optimal = sysEval.GetOptimalSystem();
+        // var bestTree = optimal.GetTree();
+        // Console.WriteLine(sysEval.GetAllStats());
+        // Console.WriteLine(optimal.ToString());
+        // // Console.WriteLine(tree.Children[1].Children[0].ToString());
+        // Console.WriteLine(bestTree);
         while (expression != null)
         {
             var tokens = lexer.Scan(expression);
@@ -72,7 +70,11 @@ public static class Program
             }
             validator.Reset();
             var hasErrors = Util.LogErrors();
-            Console.WriteLine("The expression has errors:" + hasErrors);
+            foreach (var error in hasErrors)
+            {
+                Console.WriteLine(error);
+            }
+            Console.WriteLine("The expression has errors:" + (hasErrors.Count > 0));
             // expression = Console.ReadLine();
             expression = null;
         }

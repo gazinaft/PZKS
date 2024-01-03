@@ -3,6 +3,14 @@
 public class Distributor
 {
     private static List<ExpressionNode> _distributiveNodes = new List<ExpressionNode>();
+
+    public static List<ExpressionNode> GetAllForms()
+    {
+        var result = _distributiveNodes;
+        _distributiveNodes = new List<ExpressionNode>();
+        return result;
+    }
+    
     public void Distribute(ref ExpressionNode tree)
     {
         // DistributeForMultiply(ref tree);
